@@ -1,0 +1,46 @@
+{
+  "name": "@fleetflow/cli",
+  "version": "0.1.0",
+  "description": "FleetFlow command line interface",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "fleetflow": "./bin/run.js",
+    "ff": "./bin/run.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "oclif.manifest.json",
+    "SKILL.md"
+  ],
+  "scripts": {
+    "build": "node scripts/generate-resources.js && oclif manifest",
+    "generate": "node scripts/generate-resources.js",
+    "test": "node scripts/generate-resources.js && \"$npm_execpath\" test"
+  },
+  "dependencies": {
+    "@oclif/core": "^4.5.6",
+    "@repo/js-sdk": "file:../platform/packages/js-sdk"
+  },
+  "devDependencies": {
+    "oclif": "^4.22.1"
+  },
+  "oclif": {
+    "bin": "fleetflow",
+    "dirname": "fleetflow",
+    "commands": "./src/commands",
+    "topicSeparator": " ",
+    "topics": {
+      "org": {
+        "description": "Select and inspect FleetFlow organizations"
+      },
+      "api": {
+        "description": "Call organization API endpoints directly"
+      }
+    }
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
