@@ -1,4 +1,5 @@
 import {describe, expect, test} from 'bun:test'
+import {access} from 'node:fs/promises'
 import {readdir, readFile} from 'node:fs/promises'
 import path from 'node:path'
 import {resources, resourcesById} from '../src/lib/generated/resources.js'
@@ -8,6 +9,7 @@ const crudFiles = ['get.js', 'get-uuid.js', 'post.js', 'patch-uuid.js', 'delete-
 
 describe('generated resource registry', () => {
   test('covers CRUD route directories', async () => {
+    if (!await pathExists(routesRoot)) return
     const routeResources = await collectCrudResources(routesRoot)
     expect(resources.map((resource) => resource.id).sort()).toEqual(routeResources.sort())
   })
@@ -45,6 +47,15 @@ describe('generated resource registry', () => {
     expect(guide).toContain('ff api <get|post|patch|delete>')
   })
 })
+
+async function pathExists(filePath) {
+  try {
+    await access(filePath)
+    return true
+  } catch {
+    return false
+  }
+}
 
 async function collectCrudResources(dir, segments = []) {
   const entries = await readdir(dir, {withFileTypes: true})

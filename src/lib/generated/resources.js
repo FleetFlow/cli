@@ -1,6 +1,15 @@
 export const resources = Object.freeze(
 [
   {
+    "id": "ai_agent_threads",
+    "command": "ai_agent_threads",
+    "segments": [
+      "ai_agent_threads"
+    ],
+    "label": "ai agent threads",
+    "parentArgs": []
+  },
+  {
     "id": "articles",
     "command": "articles",
     "segments": [
@@ -156,12 +165,30 @@ export const resources = Object.freeze(
     ]
   },
   {
+    "id": "customer_issue_category_profiles",
+    "command": "customer_issue_category_profiles",
+    "segments": [
+      "customer_issue_category_profiles"
+    ],
+    "label": "customer issue category profiles",
+    "parentArgs": []
+  },
+  {
     "id": "customer_metadata",
     "command": "customer_metadata",
     "segments": [
       "customer_metadata"
     ],
     "label": "customer metadata",
+    "parentArgs": []
+  },
+  {
+    "id": "customer_usage",
+    "command": "customer_usage",
+    "segments": [
+      "customer_usage"
+    ],
+    "label": "customer usage",
     "parentArgs": []
   },
   {

@@ -6,7 +6,7 @@
       "name": "@fleetflow/cli",
       "dependencies": {
         "@oclif/core": "^4.5.6",
-        "@repo/js-sdk": "file:../platform/packages/js-sdk",
+        "@repo/js-sdk": "github:FleetFlow/js-sdk",
       },
       "devDependencies": {
         "oclif": "^4.22.1",
@@ -126,7 +126,7 @@
 
     "@pnpm/npm-conf": ["@pnpm/npm-conf@3.0.2", "", { "dependencies": { "@pnpm/config.env-replace": "^1.1.0", "@pnpm/network.ca-file": "^1.0.1", "config-chain": "^1.1.11" } }, "sha512-h104Kh26rR8tm+a3Qkc5S4VLYint3FE48as7+/5oCEcKR2idC/pF1G6AhIXKI+eHPJa/3J9i5z0Al47IeGHPkA=="],
 
-    "@repo/js-sdk": ["@repo/js-sdk@file:../platform/packages/js-sdk", {}],
+    "@repo/js-sdk": ["@repo/js-sdk@github:FleetFlow/js-sdk#3d0025e", {}, "FleetFlow-js-sdk-3d0025e", "sha512-thqnxa5mPPzLt5J8L75rRF7bqg72QgaWL86dCEBCJCmS4GBPkwpmtyyLsdBkz/txn39TMCLQCkWioK2Pzn4EzA=="],
 
     "@sindresorhus/is": ["@sindresorhus/is@5.6.0", "", {}, "sha512-TV7t8GKYaJWsn00tFDqBw8+Uqmr8A0fRU1tvTQhyZzGv0sJCGRQL3JGMI3ucuKo3XIZdUP+Lx7/gh2t3lewy7g=="],
 
