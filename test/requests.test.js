@@ -1,5 +1,5 @@
 import {afterEach, describe, expect, test} from 'bun:test'
-import {createClient, requestResource, requestResourceSchema} from '../src/lib/api-client.js'
+import {createClient, requestRaw, requestResource, requestResourceSchema} from '../src/lib/api-client.js'
 import {resourcesById} from '../src/lib/generated/resources.js'
 
 const originalFetch = globalThis.fetch
@@ -55,7 +55,7 @@ describe('resource requests', () => {
   test('requests method schemas through OPTIONS', async () => {
     let captured
     globalThis.fetch = async (url, options) => {
-      captured = {url: String(url), method: options.method}
+      captured = {url: String(url), method: options.method, body: options.body}
       return new Response(JSON.stringify({data: {methods: {PATCH: {body: {sort_order: {type: 'integer'}}}}}}), {
         status: 200,
         headers: {'content-type': 'application/json'},
@@ -67,7 +67,28 @@ describe('resource requests', () => {
     expect(captured).toEqual({
       url: 'http://localhost:3002/v1/articles/{uuid1}?method=PATCH',
       method: 'OPTIONS',
+      body: null,
     })
     expect(schema.methods.PATCH.body.sort_order.type).toBe('integer')
+  })
+
+  test('sends raw OPTIONS requests without a body', async () => {
+    let captured
+    globalThis.fetch = async (url, options) => {
+      captured = {url: String(url), method: options.method, body: options.body}
+      return new Response(JSON.stringify({data: {ok: true}}), {
+        status: 200,
+        headers: {'content-type': 'application/json'},
+      })
+    }
+    const client = createClient({host: 'localhost', accessToken: 'access'}, {api_key: 'api-key'})
+    const result = await requestRaw(client, 'options', '/v1/articles/{uuid1}?method=PATCH')
+
+    expect(captured).toEqual({
+      url: 'http://localhost:3002/v1/articles/{uuid1}?method=PATCH',
+      method: 'OPTIONS',
+      body: null,
+    })
+    expect(result.ok).toBe(true)
   })
 })

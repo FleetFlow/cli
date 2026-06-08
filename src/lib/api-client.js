@@ -176,15 +176,43 @@ export async function requestResourceSchema(client, resource, action) {
 		delete: 'DELETE',
 	}[action]
 
-	return client.request(
-		'organization',
-		'v1',
-		'OPTIONS',
-		`${pathParts.join('/')}?method=${method}`,
-	)
+	return requestWithoutBody(client, 'OPTIONS', `${pathParts.join('/')}?method=${method}`)
 }
 
 export async function requestRaw(client, method, rawPath, data) {
 	const cleanPath = rawPath.replace(/^\/+/, '').replace(/^v1\/?/, '')
+	if (method.toUpperCase() === 'OPTIONS') {
+		return requestWithoutBody(client, 'OPTIONS', cleanPath)
+	}
 	return client.request('organization', 'v1', method.toUpperCase(), cleanPath, data)
+}
+
+async function requestWithoutBody(client, method, pathValue) {
+	const headers = {...client.headers}
+	if (!client.isBrowser && client.token) {
+		headers.Authorization = `Bearer ${client.token}`
+	}
+
+	const response = await fetch(`${client.buildApiRoot('organization')}/v1/${pathValue}`, {
+		method,
+		headers,
+		body: null,
+		credentials: client.isBrowser ? 'include' : 'omit',
+	})
+
+	if (response.status === 204) return undefined
+
+	const contentType = response.headers.get('content-type') || ''
+	const body = contentType.includes('application/json')
+		? await response.json()
+		: await response.text()
+
+	if (response.status < 200 || response.status >= 300) {
+		const message = typeof body === 'object'
+			? body.message || body.error_description || body.error || 'Request failed'
+			: body || 'Request failed'
+		throw new Error(message)
+	}
+
+	return body?.data ?? body
 }
