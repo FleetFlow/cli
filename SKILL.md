@@ -23,6 +23,12 @@ CRUD command files are generated from `platform/services/organization-api/src/v1
 - `ff <resource> update <uuid> (--data json | --file path | --field key=value...) [--image path] [--json] [--org selector]`
 - `ff <resource> delete <uuid> [--force] [--json] [--org selector]`
 
+Use `--schema` on any generated command to ask the organization API which request parameters are accepted for that action. It calls the resource endpoint with `OPTIONS` and prints path/query/body/file schemas extracted from the API validators.
+
+- `ff articles list --schema`
+- `ff articles create --schema --json`
+- `ff articles update --schema`
+
 Generated resources include vehicles, vehicle components, vehicle customers, customers, customer vehicles, models, components, products, orders, service tickets, users, roles, locations, warranty profiles, maintenance profiles, diagnostic profiles, translations, mobile applications, OAuth applications, and the nested CRUD resources discovered in the route tree.
 
 Nested resources place parent UUIDs before the final resource UUID. Examples:
@@ -38,7 +44,11 @@ Default output is a compact readable table/list. Use `--json` for scripting and 
 
 ## Raw API Escape Hatch
 
-Use `ff api <get|post|patch|delete> <path> [--data json] [--file path] [--json] [--org selector]` for non-CRUD endpoints, special workflows, statistics, exports, rollout endpoints, integration starts, and new routes before aliases are generated. The path can be below `/v1` or include `/v1/...`.
+Use `ff api <get|post|patch|delete|options> <path> [--data json] [--file path] [--json] [--org selector]` for non-CRUD endpoints, special workflows, statistics, exports, rollout endpoints, integration starts, schema inspection, and new routes before aliases are generated. The path can be below `/v1` or include `/v1/...`.
+
+For raw schema inspection, include the action method as a query parameter:
+
+- `ff api options /v1/articles/{uuid1}?method=PATCH --json`
 
 ## Safety Rules
 

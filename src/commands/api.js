@@ -6,7 +6,7 @@ export default class Api extends Command {
   static description = 'Call an organization API endpoint directly'
 
   static args = {
-    method: Args.string({description: 'HTTP method', required: true, options: ['get', 'post', 'patch', 'delete']}),
+    method: Args.string({description: 'HTTP method', required: true, options: ['get', 'post', 'patch', 'delete', 'options']}),
     path: Args.string({description: 'Path below /v1, or a /v1/... path', required: true}),
   }
 

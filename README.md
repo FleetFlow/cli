@@ -55,11 +55,21 @@ ff <resource> update <uuid> --field key=value [--json] [--org selector]
 ff <resource> delete <uuid> --force [--json] [--org selector]
 ```
 
+Generated commands can ask the organization API for accepted request parameters:
+
+```bash
+ff articles update --schema
+ff articles update --schema --json
+```
+
+`--schema` calls `OPTIONS` for the matching resource and action, then prints the available path, query, body, and file parameters extracted from the API validators. This is useful when you need to know whether a field is accepted before sending an update.
+
 For endpoints that do not have a generated command yet, use the raw API command:
 
 ```bash
 ff api get /v1/vehicles --json
 ff api post /v1/vehicles --data '{"name":"Demo"}' --json
+ff api options /v1/articles/{uuid1}?method=PATCH --json
 ```
 
 ## Authentication And Organization Context

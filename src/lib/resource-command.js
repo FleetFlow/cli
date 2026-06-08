@@ -1,7 +1,7 @@
 import {Args, Command, Flags} from '@oclif/core'
 import readline from 'node:readline/promises'
 import {stdin as input, stdout as output} from 'node:process'
-import {buildListQuery, getOrganizationContext, maybeFormData, parseInput, requestResource} from './api-client.js'
+import {buildListQuery, getOrganizationContext, maybeFormData, parseInput, requestResource, requestResourceSchema} from './api-client.js'
 import {outputJson, printReadable} from './output.js'
 import {resourcesById} from './generated/resources.js'
 
@@ -9,15 +9,16 @@ export function makeResourceCommand(resourceId, action) {
   const resource = resourcesById[resourceId]
   const argEntries = {}
   for (const arg of resource.parentArgs) {
-    argEntries[arg.name] = Args.string({description: arg.description, required: true})
+    argEntries[arg.name] = Args.string({description: arg.description, required: false})
   }
   if (['get', 'update', 'delete'].includes(action)) {
-    argEntries.uuid = Args.string({description: `${resource.label} UUID`, required: true})
+    argEntries.uuid = Args.string({description: `${resource.label} UUID`, required: false})
   }
 
   const flags = {
     json: Flags.boolean({description: 'Output raw JSON'}),
     org: Flags.string({description: 'Organization UUID, API key, name, or slug'}),
+    schema: Flags.boolean({description: 'Show accepted request parameters for this command'}),
   }
   if (action === 'list') {
     flags.page = Flags.integer({description: 'Page number'})
@@ -43,7 +44,18 @@ export function makeResourceCommand(resourceId, action) {
 
     async run() {
       const parsed = await this.parse(this.constructor)
+      if (!parsed.flags.schema) {
+        requireArgs(resource, action, parsed.args)
+      }
+
       const {client} = await getOrganizationContext(this.config.configDir, parsed.flags)
+
+      if (parsed.flags.schema) {
+        const schema = await requestResourceSchema(client, resource, action)
+        if (parsed.flags.json) return outputJson(this, schema)
+        return printSchema(this, schema, action)
+      }
+
       let data
       if (action === 'list') data = buildListQuery(parsed.flags)
       if (['create', 'update'].includes(action)) {
@@ -56,6 +68,62 @@ export function makeResourceCommand(resourceId, action) {
       printReadable(this, result)
     }
   }
+}
+
+function requireArgs(resource, action, args) {
+  const missing = resource.parentArgs
+    .map((arg) => arg.name)
+    .filter((name) => !args[name])
+
+  if (['get', 'update', 'delete'].includes(action) && !args.uuid) {
+    missing.push('uuid')
+  }
+
+  if (missing.length > 0) {
+    throw new Error(`Missing required argument${missing.length === 1 ? '' : 's'}: ${missing.join(', ')}`)
+  }
+}
+
+function printSchema(command, schema, action) {
+  const method = {
+    list: 'GET',
+    create: 'POST',
+    update: 'PATCH',
+    get: 'GET',
+    delete: 'DELETE',
+  }[action]
+  const methodSchema = schema.methods?.[method]
+
+  if (!methodSchema) {
+    command.log(`No ${method} schema available.`)
+    return
+  }
+
+  command.log(`${method} ${methodSchema.path}`)
+
+  for (const section of ['params', 'query', 'body', 'file', 'files']) {
+    const fields = methodSchema[section]
+    if (!fields || Object.keys(fields).length === 0) continue
+
+    command.log(`\n${section}:`)
+    for (const [name, spec] of Object.entries(fields)) {
+      command.log(`  ${name}  ${formatSpec(spec)}`)
+    }
+  }
+}
+
+function formatSpec(spec) {
+  if (!spec || typeof spec !== 'object') return String(spec)
+
+  const details = []
+  if (spec.type !== undefined) {
+    details.push(`type=${Array.isArray(spec.type) ? spec.type.join('|') : spec.type}`)
+  }
+  details.push(`required=${Boolean(spec.required)}`)
+  if (spec.may_be_null !== undefined) details.push(`nullable=${Boolean(spec.may_be_null)}`)
+  if (spec.allowed_values) details.push(`allowed=${spec.allowed_values.join('|')}`)
+  if (spec._error) details.push(spec._error)
+  return details.join(' ')
 }
 
 function buildAliases(resource, action) {

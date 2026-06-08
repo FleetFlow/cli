@@ -1,5 +1,5 @@
 import {afterEach, describe, expect, test} from 'bun:test'
-import {createClient, requestResource} from '../src/lib/api-client.js'
+import {createClient, requestResource, requestResourceSchema} from '../src/lib/api-client.js'
 import {resourcesById} from '../src/lib/generated/resources.js'
 
 const originalFetch = globalThis.fetch
@@ -50,5 +50,24 @@ describe('resource requests', () => {
       url: 'http://localhost:3002/v1/vehicles/vehicle-1/components',
       method: 'GET',
     })
+  })
+
+  test('requests method schemas through OPTIONS', async () => {
+    let captured
+    globalThis.fetch = async (url, options) => {
+      captured = {url: String(url), method: options.method}
+      return new Response(JSON.stringify({data: {methods: {PATCH: {body: {sort_order: {type: 'integer'}}}}}}), {
+        status: 200,
+        headers: {'content-type': 'application/json'},
+      })
+    }
+    const client = createClient({host: 'localhost', accessToken: 'access'}, {api_key: 'api-key'})
+    const schema = await requestResourceSchema(client, resourcesById.articles, 'update')
+
+    expect(captured).toEqual({
+      url: 'http://localhost:3002/v1/articles/{uuid1}?method=PATCH',
+      method: 'OPTIONS',
+    })
+    expect(schema.methods.PATCH.body.sort_order.type).toBe('integer')
   })
 })

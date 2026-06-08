@@ -152,7 +152,39 @@ export async function requestResource(client, resource, action, args, data) {
   return client.request('organization', 'v1', method.toUpperCase(), pathValue, data)
 }
 
+export async function requestResourceSchema(client, resource, action) {
+	const pathParts = []
+	let uuidIndex = 1
+
+	resource.segments.forEach((segment, index) => {
+		pathParts.push(segment)
+		if (index < resource.segments.length - 1) {
+			pathParts.push(`{uuid${uuidIndex}}`)
+			uuidIndex++
+		}
+	})
+
+	if (['get', 'update', 'delete'].includes(action)) {
+		pathParts.push(`{uuid${uuidIndex}}`)
+	}
+
+	const method = {
+		list: 'GET',
+		create: 'POST',
+		update: 'PATCH',
+		get: 'GET',
+		delete: 'DELETE',
+	}[action]
+
+	return client.request(
+		'organization',
+		'v1',
+		'OPTIONS',
+		`${pathParts.join('/')}?method=${method}`,
+	)
+}
+
 export async function requestRaw(client, method, rawPath, data) {
-  const cleanPath = rawPath.replace(/^\/+/, '').replace(/^v1\/?/, '')
-  return client.request('organization', 'v1', method.toUpperCase(), cleanPath, data)
+	const cleanPath = rawPath.replace(/^\/+/, '').replace(/^v1\/?/, '')
+	return client.request('organization', 'v1', method.toUpperCase(), cleanPath, data)
 }
