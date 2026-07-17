@@ -9,7 +9,10 @@ export function createClient(state, organization) {
   if (organization?.api_key) headers['X-Api-Key'] = organization.api_key
   const client = new FleetFlowSDK(state.host || 'fleetflow.io', headers, state.host === 'localhost')
   if (state.accessToken) client.setToken(state.accessToken)
-  client.setOAuthConfig({clientId: CLI_CLIENT_ID})
+  client.setOAuthConfig({
+    clientId: CLI_CLIENT_ID,
+    tokenEndpoint: `${client.getAuthBaseURL()}/api/better-auth/oauth2/token`,
+  })
   return client
 }
 

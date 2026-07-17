@@ -14,12 +14,13 @@ export function redirectUriForPort(port = DEFAULT_CALLBACK_PORT, host = '127.0.0
   return `http://${host}:${port}/callback`
 }
 
-export async function buildLoginRequest({host, port, state, prompt} = {}) {
+export async function buildLoginRequest({host, port, state, prompt = 'login'} = {}) {
   const sdk = createSdk(host)
   sdk.setOAuthConfig({
     clientId: CLI_CLIENT_ID,
     redirectUri: redirectUriForPort(port),
     scopes: CLI_SCOPES,
+    tokenEndpoint: `${sdk.getAuthBaseURL()}/api/better-auth/oauth2/token`,
   })
   const {verifier, challenge} = await sdk.generatePkcePair()
   const url = sdk.buildOAuthAuthorizeUrl({
@@ -81,7 +82,7 @@ export function waitForOAuthCallback({port, expectedState}) {
 
 export async function fetchUserInfo({host, accessToken}) {
   const sdk = createSdk(host)
-  const res = await fetch(`${sdk.getAuthBaseURL()}/api/oauth/userinfo`, {
+  const res = await fetch(`${sdk.getAuthBaseURL()}/api/better-auth/oauth2/userinfo`, {
     headers: {Authorization: `Bearer ${accessToken}`},
   })
   const text = await res.text()

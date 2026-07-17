@@ -22,7 +22,7 @@ describe('token refresh', () => {
         expiresAt: 1000,
       })
       globalThis.fetch = async (url, options) => {
-        expect(String(url)).toBe('http://localhost:3104/oauth/token')
+		expect(String(url)).toBe('http://localhost:3104/api/better-auth/oauth2/token')
         expect(options.method).toBe('POST')
         return new Response(JSON.stringify({
           access_token: 'new',

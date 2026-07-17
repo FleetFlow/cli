@@ -12,6 +12,7 @@ describe('oauth helpers', () => {
     expect(url.searchParams.get('redirect_uri')).toBe('http://127.0.0.1:17891/callback')
     expect(url.searchParams.get('code_challenge_method')).toBe('S256')
     expect(url.searchParams.get('code_challenge')).toBeTruthy()
+    expect(url.searchParams.get('prompt')).toBe('login')
   })
 
   test('handles localhost callback with state validation', async () => {
