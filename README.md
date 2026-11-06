@@ -64,6 +64,18 @@ ff articles update --schema --json
 
 `--schema` calls `OPTIONS` for the matching resource and action, then prints the available path, query, body, and file parameters extracted from the API validators. This is useful when you need to know whether a field is accepted before sending an update.
 
+### File uploads
+
+`create`, `update` and `ff api` accept `--upload [field=]path` (repeatable). The request is then sent as multipart form data: body fields from `--field`/`--data` become form fields and each file is attached under its field name. A bare path is sent as `file`; `--image path` is shorthand for `--upload image=path`.
+
+```bash
+ff products firmwares create <product_uuid> --upload ./firmware.bin \
+  --field version=1.3.1 --field status=active --field kind=release --json
+ff api post /v1/products/<product_uuid>/firmwares --upload ./firmware.bin --field version=1.3.1
+```
+
+FleetFlow computes the firmware's SHA-256 from the uploaded file.
+
 For endpoints that do not have a generated command yet, use the raw API command:
 
 ```bash

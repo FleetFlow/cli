@@ -19,8 +19,8 @@ CRUD command files are generated from `platform/services/organization-api/src/v1
 
 - `ff <resource> list [--page n] [--query text] [--match key=value] [--no-limit] [--json] [--org selector]`
 - `ff <resource> get <uuid> [--json] [--org selector]`
-- `ff <resource> create (--data json | --file path | --field key=value...) [--image path] [--json] [--org selector]`
-- `ff <resource> update <uuid> (--data json | --file path | --field key=value...) [--image path] [--json] [--org selector]`
+- `ff <resource> create (--data json | --file path | --field key=value...) [--upload [field=]path] [--image path] [--json] [--org selector]`
+- `ff <resource> update <uuid> (--data json | --file path | --field key=value...) [--upload [field=]path] [--image path] [--json] [--org selector]`
 - `ff <resource> delete <uuid> [--force] [--json] [--org selector]`
 
 Use `--schema` on any generated command to ask the organization API which request parameters are accepted for that action. It calls the resource endpoint with `OPTIONS` and prints path/query/body/file schemas extracted from the API validators.
@@ -29,22 +29,28 @@ Use `--schema` on any generated command to ask the organization API which reques
 - `ff articles create --schema --json`
 - `ff articles update --schema`
 
-Generated resources include vehicles, vehicle components, vehicle customers, customers, customer vehicles, models, components, products, orders, service tickets, users, roles, locations, warranty profiles, maintenance profiles, diagnostic profiles, translations, mobile applications, OAuth applications, and the nested CRUD resources discovered in the route tree.
+Generated resources include vehicles, vehicle products, vehicle customers, customers, customer vehicles, models, components, products, orders, service tickets, users, roles, locations, warranty profiles, maintenance profiles, diagnostic profiles, translations, mobile applications, OAuth applications, and the nested CRUD resources discovered in the route tree.
 
 Nested resources place parent UUIDs before the final resource UUID. Examples:
 
-- `ff vehicles components list <vehicle_uuid>`
-- `ff vehicles components get <vehicle_uuid> <uuid>`
+- `ff vehicles products list <vehicle_uuid>`
+- `ff vehicles products get <vehicle_uuid> <uuid>`
 - `ff customers vehicles list <customer_uuid>`
-- `ff orders components create <order_uuid> --field component_uuid=... --field quantity=1`
+- `ff products firmwares list <product_uuid>`
 
-Input for create/update accepts JSON from `--data`, JSON file content from `--file`, piped stdin, or repeated `--field key=value`. Dotted field keys create nested objects. Values like `true`, `false`, `null`, numbers, arrays, and objects are parsed as JSON when possible. `--image path` sends multipart form data with an `image` file.
+Input for create/update accepts JSON from `--data`, JSON file content from `--file`, piped stdin, or repeated `--field key=value`. Dotted field keys create nested objects. Values like `true`, `false`, `null`, numbers, arrays, and objects are parsed as JSON when possible. `--upload [field=]path` (repeatable) sends multipart form data instead of JSON: every body field becomes a form field and each file is attached under its field name. A bare path is sent as `file`, which upload routes such as firmwares read; `--image path` is shorthand for `--upload image=path`. Run `--schema` to see which file field a route expects.
+
+Uploading a firmware build to a product:
+
+- `ff products firmwares create <product_uuid> --upload ./firmware.bin --field version=1.3.1 --field status=active --field kind=release`
+
+FleetFlow computes the SHA-256 from the uploaded file.
 
 Default output is a compact readable table/list. Use `--json` for scripting and to preserve raw API response shape.
 
 ## Raw API Escape Hatch
 
-Use `ff api <get|post|patch|delete|options> <path> [--data json] [--file path] [--json] [--org selector]` for non-CRUD endpoints, special workflows, statistics, exports, rollout endpoints, integration starts, schema inspection, and new routes before aliases are generated. The path can be below `/v1` or include `/v1/...`.
+Use `ff api <get|post|patch|delete|options> <path> [--data json] [--file path] [--field key=value] [--upload [field=]path] [--json] [--org selector]` for non-CRUD endpoints, special workflows, statistics, exports, rollout endpoints, integration starts, schema inspection, and new routes before aliases are generated. The path can be below `/v1` or include `/v1/...`.
 
 For raw schema inspection, include the action method as a query parameter:
 

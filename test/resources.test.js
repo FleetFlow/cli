@@ -17,13 +17,14 @@ describe('generated resource registry', () => {
   test('includes common FleetFlow resources and nested examples', async () => {
     for (const id of [
       'vehicles',
-      'vehicles/components',
+      'vehicles/products',
       'vehicles/customers',
       'customers',
       'customers/vehicles',
       'models',
       'components',
       'products',
+      'products/firmwares',
       'orders',
       'service_tickets',
       'users',
@@ -43,8 +44,9 @@ describe('generated resource registry', () => {
   test('agent guide describes registry-backed behavior', async () => {
     const guide = await readFile(path.resolve(import.meta.dirname, '../SKILL.md'), 'utf8')
     expect(guide).toContain('bun run generate')
-    expect(guide).toContain('ff vehicles components list <vehicle_uuid>')
-    expect(guide).toContain('ff api <get|post|patch|delete>')
+    expect(guide).toContain('ff vehicles products list <vehicle_uuid>')
+    expect(guide).toContain('--upload [field=]path')
+    expect(guide).toContain('ff api <get|post|patch|delete|options>')
   })
 })
 

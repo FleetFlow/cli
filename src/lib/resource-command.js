@@ -1,7 +1,7 @@
 import {Args, Command, Flags} from '@oclif/core'
 import readline from 'node:readline/promises'
 import {stdin as input, stdout as output} from 'node:process'
-import {buildListQuery, getOrganizationContext, maybeFormData, parseInput, requestResource, requestResourceSchema} from './api-client.js'
+import {buildListQuery, getOrganizationContext, maybeFormData, parseInput, parseUploads, requestResource, requestResourceSchema} from './api-client.js'
 import {outputJson, printReadable} from './output.js'
 import {resourcesById} from './generated/resources.js'
 
@@ -30,7 +30,8 @@ export function makeResourceCommand(resourceId, action) {
     flags.data = Flags.string({description: 'JSON request body'})
     flags.file = Flags.file({description: 'Read JSON request body from a file'})
     flags.field = Flags.string({description: 'Set a body field as key=value; supports dotted keys', multiple: true, multipleNonGreedy: true})
-    flags.image = Flags.file({description: 'Attach an image file'})
+    flags.image = Flags.file({description: 'Attach an image file (same as --upload image=<path>)'})
+    flags.upload = Flags.string({description: 'Attach a file as [field=]path; a bare path is sent as "file". Repeatable', multiple: true, multipleNonGreedy: true})
   }
   if (action === 'delete') {
     flags.force = Flags.boolean({char: 'f', description: 'Skip the confirmation prompt'})
@@ -59,7 +60,7 @@ export function makeResourceCommand(resourceId, action) {
       let data
       if (action === 'list') data = buildListQuery(parsed.flags)
       if (['create', 'update'].includes(action)) {
-        data = await maybeFormData(await parseInput(parsed.flags), parsed.flags.image)
+        data = await maybeFormData(await parseInput(parsed.flags), uploadsFromFlags(parsed.flags))
       }
       if (action === 'delete') await confirmDelete(this, parsed.flags)
 
@@ -68,6 +69,12 @@ export function makeResourceCommand(resourceId, action) {
       printReadable(this, result)
     }
   }
+}
+
+function uploadsFromFlags(flags) {
+  const uploads = parseUploads(flags.upload)
+  if (flags.image) uploads.push({field: 'image', path: flags.image})
+  return uploads
 }
 
 function requireArgs(resource, action, args) {

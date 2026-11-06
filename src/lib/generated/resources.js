@@ -43,6 +43,24 @@ export const resources = Object.freeze(
     "parentArgs": []
   },
   {
+    "id": "automations",
+    "command": "automations",
+    "segments": [
+      "automations"
+    ],
+    "label": "automations",
+    "parentArgs": []
+  },
+  {
+    "id": "campaigns",
+    "command": "campaigns",
+    "segments": [
+      "campaigns"
+    ],
+    "label": "campaigns",
+    "parentArgs": []
+  },
+  {
     "id": "clans",
     "command": "clans",
     "segments": [
@@ -165,6 +183,15 @@ export const resources = Object.freeze(
     ]
   },
   {
+    "id": "custom_domains",
+    "command": "custom_domains",
+    "segments": [
+      "custom_domains"
+    ],
+    "label": "custom domains",
+    "parentArgs": []
+  },
+  {
     "id": "customer_issue_category_profiles",
     "command": "customer_issue_category_profiles",
     "segments": [
@@ -199,21 +226,6 @@ export const resources = Object.freeze(
     ],
     "label": "customers",
     "parentArgs": []
-  },
-  {
-    "id": "customers/addresses",
-    "command": "customers addresses",
-    "segments": [
-      "customers",
-      "addresses"
-    ],
-    "label": "customers addresses",
-    "parentArgs": [
-      {
-        "name": "customer_uuid",
-        "description": "customers UUID"
-      }
-    ]
   },
   {
     "id": "customers/clans",
@@ -313,6 +325,21 @@ export const resources = Object.freeze(
       "ownership_requests"
     ],
     "label": "customers ownership requests",
+    "parentArgs": [
+      {
+        "name": "customer_uuid",
+        "description": "customers UUID"
+      }
+    ]
+  },
+  {
+    "id": "customers/places",
+    "command": "customers places",
+    "segments": [
+      "customers",
+      "places"
+    ],
+    "label": "customers places",
     "parentArgs": [
       {
         "name": "customer_uuid",
@@ -425,6 +452,39 @@ export const resources = Object.freeze(
     ]
   },
   {
+    "id": "email_templates",
+    "command": "email_templates",
+    "segments": [
+      "email_templates"
+    ],
+    "label": "email templates",
+    "parentArgs": []
+  },
+  {
+    "id": "entitlements",
+    "command": "entitlements",
+    "segments": [
+      "entitlements"
+    ],
+    "label": "entitlements",
+    "parentArgs": []
+  },
+  {
+    "id": "entitlements/grants",
+    "command": "entitlements grants",
+    "segments": [
+      "entitlements",
+      "grants"
+    ],
+    "label": "entitlements grants",
+    "parentArgs": [
+      {
+        "name": "entitlement_uuid",
+        "description": "entitlements UUID"
+      }
+    ]
+  },
+  {
     "id": "integrations/stripe/payment_methods",
     "command": "integrations stripe payment_methods",
     "segments": [
@@ -507,6 +567,21 @@ export const resources = Object.freeze(
     ]
   },
   {
+    "id": "mobile_applications/install_links",
+    "command": "mobile_applications install_links",
+    "segments": [
+      "mobile_applications",
+      "install_links"
+    ],
+    "label": "mobile applications install links",
+    "parentArgs": [
+      {
+        "name": "mobile_application_uuid",
+        "description": "mobile applications UUID"
+      }
+    ]
+  },
+  {
     "id": "mobile_applications/releases",
     "command": "mobile_applications releases",
     "segments": [
@@ -581,6 +656,81 @@ export const resources = Object.freeze(
     ]
   },
   {
+    "id": "models/configurations",
+    "command": "models configurations",
+    "segments": [
+      "models",
+      "configurations"
+    ],
+    "label": "models configurations",
+    "parentArgs": [
+      {
+        "name": "model_uuid",
+        "description": "models UUID"
+      }
+    ]
+  },
+  {
+    "id": "models/configurations/bom_revisions",
+    "command": "models configurations bom_revisions",
+    "segments": [
+      "models",
+      "configurations",
+      "bom_revisions"
+    ],
+    "label": "models configurations bom revisions",
+    "parentArgs": [
+      {
+        "name": "model_uuid",
+        "description": "models UUID"
+      },
+      {
+        "name": "configuration_uuid",
+        "description": "configurations UUID"
+      }
+    ]
+  },
+  {
+    "id": "models/configurations/components",
+    "command": "models configurations components",
+    "segments": [
+      "models",
+      "configurations",
+      "components"
+    ],
+    "label": "models configurations components",
+    "parentArgs": [
+      {
+        "name": "model_uuid",
+        "description": "models UUID"
+      },
+      {
+        "name": "configuration_uuid",
+        "description": "configurations UUID"
+      }
+    ]
+  },
+  {
+    "id": "models/configurations/products",
+    "command": "models configurations products",
+    "segments": [
+      "models",
+      "configurations",
+      "products"
+    ],
+    "label": "models configurations products",
+    "parentArgs": [
+      {
+        "name": "model_uuid",
+        "description": "models UUID"
+      },
+      {
+        "name": "configuration_uuid",
+        "description": "configurations UUID"
+      }
+    ]
+  },
+  {
     "id": "models/diagnostic_profiles",
     "command": "models diagnostic_profiles",
     "segments": [
@@ -588,6 +738,21 @@ export const resources = Object.freeze(
       "diagnostic_profiles"
     ],
     "label": "models diagnostic profiles",
+    "parentArgs": [
+      {
+        "name": "model_uuid",
+        "description": "models UUID"
+      }
+    ]
+  },
+  {
+    "id": "models/entitlements",
+    "command": "models entitlements",
+    "segments": [
+      "models",
+      "entitlements"
+    ],
+    "label": "models entitlements",
     "parentArgs": [
       {
         "name": "model_uuid",
@@ -607,6 +772,41 @@ export const resources = Object.freeze(
       {
         "name": "model_uuid",
         "description": "models UUID"
+      }
+    ]
+  },
+  {
+    "id": "models/options",
+    "command": "models options",
+    "segments": [
+      "models",
+      "options"
+    ],
+    "label": "models options",
+    "parentArgs": [
+      {
+        "name": "model_uuid",
+        "description": "models UUID"
+      }
+    ]
+  },
+  {
+    "id": "models/options/values",
+    "command": "models options values",
+    "segments": [
+      "models",
+      "options",
+      "values"
+    ],
+    "label": "models options values",
+    "parentArgs": [
+      {
+        "name": "model_uuid",
+        "description": "models UUID"
+      },
+      {
+        "name": "option_uuid",
+        "description": "options UUID"
       }
     ]
   },
@@ -728,14 +928,14 @@ export const resources = Object.freeze(
     ]
   },
   {
-    "id": "partners/orders/components",
-    "command": "partners orders components",
+    "id": "partners/orders/products",
+    "command": "partners orders products",
     "segments": [
       "partners",
       "orders",
-      "components"
+      "products"
     ],
-    "label": "partners orders components",
+    "label": "partners orders products",
     "parentArgs": [
       {
         "name": "partner_uuid",
@@ -828,6 +1028,15 @@ export const resources = Object.freeze(
     ]
   },
   {
+    "id": "product_collections",
+    "command": "product_collections",
+    "segments": [
+      "product_collections"
+    ],
+    "label": "product collections",
+    "parentArgs": []
+  },
+  {
     "id": "products",
     "command": "products",
     "segments": [
@@ -835,6 +1044,106 @@ export const resources = Object.freeze(
     ],
     "label": "products",
     "parentArgs": []
+  },
+  {
+    "id": "products/common_issues",
+    "command": "products common_issues",
+    "segments": [
+      "products",
+      "common_issues"
+    ],
+    "label": "products common issues",
+    "parentArgs": [
+      {
+        "name": "product_uuid",
+        "description": "products UUID"
+      }
+    ]
+  },
+  {
+    "id": "products/dependencies",
+    "command": "products dependencies",
+    "segments": [
+      "products",
+      "dependencies"
+    ],
+    "label": "products dependencies",
+    "parentArgs": [
+      {
+        "name": "product_uuid",
+        "description": "products UUID"
+      }
+    ]
+  },
+  {
+    "id": "products/firmwares",
+    "command": "products firmwares",
+    "segments": [
+      "products",
+      "firmwares"
+    ],
+    "label": "products firmwares",
+    "parentArgs": [
+      {
+        "name": "product_uuid",
+        "description": "products UUID"
+      }
+    ]
+  },
+  {
+    "id": "products/firmwares/changelogs",
+    "command": "products firmwares changelogs",
+    "segments": [
+      "products",
+      "firmwares",
+      "changelogs"
+    ],
+    "label": "products firmwares changelogs",
+    "parentArgs": [
+      {
+        "name": "product_uuid",
+        "description": "products UUID"
+      },
+      {
+        "name": "firmware_uuid",
+        "description": "firmwares UUID"
+      }
+    ]
+  },
+  {
+    "id": "products/firmwares/rollouts",
+    "command": "products firmwares rollouts",
+    "segments": [
+      "products",
+      "firmwares",
+      "rollouts"
+    ],
+    "label": "products firmwares rollouts",
+    "parentArgs": [
+      {
+        "name": "product_uuid",
+        "description": "products UUID"
+      },
+      {
+        "name": "firmware_uuid",
+        "description": "firmwares UUID"
+      }
+    ]
+  },
+  {
+    "id": "products/metadata",
+    "command": "products metadata",
+    "segments": [
+      "products",
+      "metadata"
+    ],
+    "label": "products metadata",
+    "parentArgs": [
+      {
+        "name": "product_uuid",
+        "description": "products UUID"
+      }
+    ]
   },
   {
     "id": "products/variants",
@@ -848,6 +1157,26 @@ export const resources = Object.freeze(
       {
         "name": "product_uuid",
         "description": "products UUID"
+      }
+    ]
+  },
+  {
+    "id": "products/variants/compatibility",
+    "command": "products variants compatibility",
+    "segments": [
+      "products",
+      "variants",
+      "compatibility"
+    ],
+    "label": "products variants compatibility",
+    "parentArgs": [
+      {
+        "name": "product_uuid",
+        "description": "products UUID"
+      },
+      {
+        "name": "variant_uuid",
+        "description": "variants UUID"
       }
     ]
   },
@@ -896,6 +1225,21 @@ export const resources = Object.freeze(
     ]
   },
   {
+    "id": "recalls/products",
+    "command": "recalls products",
+    "segments": [
+      "recalls",
+      "products"
+    ],
+    "label": "recalls products",
+    "parentArgs": [
+      {
+        "name": "recall_uuid",
+        "description": "recalls UUID"
+      }
+    ]
+  },
+  {
     "id": "recalls/vehicles",
     "command": "recalls vehicles",
     "segments": [
@@ -926,6 +1270,15 @@ export const resources = Object.freeze(
       "roles"
     ],
     "label": "roles",
+    "parentArgs": []
+  },
+  {
+    "id": "service_appointments",
+    "command": "service_appointments",
+    "segments": [
+      "service_appointments"
+    ],
+    "label": "service appointments",
     "parentArgs": []
   },
   {
@@ -966,6 +1319,15 @@ export const resources = Object.freeze(
         "description": "service tickets UUID"
       }
     ]
+  },
+  {
+    "id": "service_work_reservations",
+    "command": "service_work_reservations",
+    "segments": [
+      "service_work_reservations"
+    ],
+    "label": "service work reservations",
+    "parentArgs": []
   },
   {
     "id": "services",
@@ -1097,6 +1459,15 @@ export const resources = Object.freeze(
     ]
   },
   {
+    "id": "vat_rates",
+    "command": "vat_rates",
+    "segments": [
+      "vat_rates"
+    ],
+    "label": "vat rates",
+    "parentArgs": []
+  },
+  {
     "id": "vehicle_imports",
     "command": "vehicle_imports",
     "segments": [
@@ -1106,13 +1477,13 @@ export const resources = Object.freeze(
     "parentArgs": []
   },
   {
-    "id": "vehicle_imports/component_mappings",
-    "command": "vehicle_imports component_mappings",
+    "id": "vehicle_imports/model_mappings",
+    "command": "vehicle_imports model_mappings",
     "segments": [
       "vehicle_imports",
-      "component_mappings"
+      "model_mappings"
     ],
-    "label": "vehicle imports component mappings",
+    "label": "vehicle imports model mappings",
     "parentArgs": [
       {
         "name": "vehicle_import_uuid",
@@ -1121,13 +1492,13 @@ export const resources = Object.freeze(
     ]
   },
   {
-    "id": "vehicle_imports/model_mappings",
-    "command": "vehicle_imports model_mappings",
+    "id": "vehicle_imports/product_mappings",
+    "command": "vehicle_imports product_mappings",
     "segments": [
       "vehicle_imports",
-      "model_mappings"
+      "product_mappings"
     ],
-    "label": "vehicle imports model mappings",
+    "label": "vehicle imports product mappings",
     "parentArgs": [
       {
         "name": "vehicle_import_uuid",
@@ -1158,61 +1529,6 @@ export const resources = Object.freeze(
     ],
     "label": "vehicles",
     "parentArgs": []
-  },
-  {
-    "id": "vehicles/components",
-    "command": "vehicles components",
-    "segments": [
-      "vehicles",
-      "components"
-    ],
-    "label": "vehicles components",
-    "parentArgs": [
-      {
-        "name": "vehicle_uuid",
-        "description": "vehicles UUID"
-      }
-    ]
-  },
-  {
-    "id": "vehicles/components/fault_codes",
-    "command": "vehicles components fault_codes",
-    "segments": [
-      "vehicles",
-      "components",
-      "fault_codes"
-    ],
-    "label": "vehicles components fault codes",
-    "parentArgs": [
-      {
-        "name": "vehicle_uuid",
-        "description": "vehicles UUID"
-      },
-      {
-        "name": "component_uuid",
-        "description": "components UUID"
-      }
-    ]
-  },
-  {
-    "id": "vehicles/components/metadata",
-    "command": "vehicles components metadata",
-    "segments": [
-      "vehicles",
-      "components",
-      "metadata"
-    ],
-    "label": "vehicles components metadata",
-    "parentArgs": [
-      {
-        "name": "vehicle_uuid",
-        "description": "vehicles UUID"
-      },
-      {
-        "name": "component_uuid",
-        "description": "components UUID"
-      }
-    ]
   },
   {
     "id": "vehicles/customer_invitations",
@@ -1366,6 +1682,61 @@ export const resources = Object.freeze(
       {
         "name": "vehicle_uuid",
         "description": "vehicles UUID"
+      }
+    ]
+  },
+  {
+    "id": "vehicles/products",
+    "command": "vehicles products",
+    "segments": [
+      "vehicles",
+      "products"
+    ],
+    "label": "vehicles products",
+    "parentArgs": [
+      {
+        "name": "vehicle_uuid",
+        "description": "vehicles UUID"
+      }
+    ]
+  },
+  {
+    "id": "vehicles/products/fault_codes",
+    "command": "vehicles products fault_codes",
+    "segments": [
+      "vehicles",
+      "products",
+      "fault_codes"
+    ],
+    "label": "vehicles products fault codes",
+    "parentArgs": [
+      {
+        "name": "vehicle_uuid",
+        "description": "vehicles UUID"
+      },
+      {
+        "name": "product_uuid",
+        "description": "products UUID"
+      }
+    ]
+  },
+  {
+    "id": "vehicles/products/metadata",
+    "command": "vehicles products metadata",
+    "segments": [
+      "vehicles",
+      "products",
+      "metadata"
+    ],
+    "label": "vehicles products metadata",
+    "parentArgs": [
+      {
+        "name": "vehicle_uuid",
+        "description": "vehicles UUID"
+      },
+      {
+        "name": "product_uuid",
+        "description": "products UUID"
       }
     ]
   },

@@ -4,6 +4,48 @@ import FleetFlowSDK from '@repo/js-sdk'
 import {CLI_CLIENT_ID, REFRESH_SKEW_MS} from './constants.js'
 import {mergeTokenState, readState, resolveOrganization, writeState} from './state.js'
 
+// Network errors where the request never reached FleetFlow (no connection was made), so even a POST can be sent
+// again safely.
+const NOT_SENT_CODES = new Set([
+  'UND_ERR_CONNECT_TIMEOUT', 'ECONNREFUSED', 'EAI_AGAIN', 'ENOTFOUND', 'ENETUNREACH', 'EHOSTUNREACH',
+])
+// Network errors after the request may have arrived; only retried for requests that are safe to repeat.
+const MAYBE_SENT_CODES = new Set([
+  'ECONNRESET', 'ETIMEDOUT', 'EPIPE', 'UND_ERR_SOCKET', 'UND_ERR_HEADERS_TIMEOUT', 'UND_ERR_BODY_TIMEOUT',
+])
+const REPEATABLE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE'])
+export const RETRY_DELAYS_MS = [500, 1500, 4000]
+
+/// The network error code of a failed fetch (Node puts it on `cause`), or undefined.
+export function networkErrorCode(error) {
+  return error?.cause?.code || error?.code
+}
+
+export function isRetryableNetworkError(error, method = 'GET') {
+  const code = networkErrorCode(error)
+  if (!code) return false
+  if (NOT_SENT_CODES.has(code)) return true
+  return MAYBE_SENT_CODES.has(code) && REPEATABLE_METHODS.has(String(method).toUpperCase())
+}
+
+/// Runs a request, trying again after a short wait when the connection failed (a timeout or reset, not an error
+/// response from FleetFlow).
+export async function withNetworkRetry(method, send, {delays = RETRY_DELAYS_MS, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), onRetry} = {}) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await send()
+    } catch (error) {
+      if (attempt >= delays.length || !isRetryableNetworkError(error, method)) throw error
+      onRetry?.(error, attempt + 1)
+      await sleep(delays[attempt])
+    }
+  }
+}
+
+function logRetry(error, attempt) {
+  process.stderr.write(`Connection problem (${networkErrorCode(error)}), retrying (${attempt}/${RETRY_DELAYS_MS.length})...\n`)
+}
+
 export function createClient(state, organization) {
   const headers = {}
   if (organization?.api_key) headers['X-Api-Key'] = organization.api_key
@@ -14,6 +56,12 @@ export function createClient(state, organization) {
     tokenEndpoint: `${client.getAuthBaseURL()}/api/better-auth/oauth2/token`,
   })
   return client
+}
+
+/// An organization API request through the SDK, retried on connection problems. (The SDK client is a Proxy, so
+/// its `request` can't be wrapped in place.)
+function sendRequest(client, method, pathValue, data) {
+  return withNetworkRetry(method, () => client.request('organization', 'v1', method, pathValue, data), {onRetry: logRetry})
 }
 
 export async function ensureAccessToken(configDir, now = Date.now()) {
@@ -124,14 +172,29 @@ export async function parseInput(flags = {}, stdin = process.stdin) {
   return data
 }
 
-export async function maybeFormData(data, imagePath) {
-  if (!imagePath) return data
+/// Parses repeated `--upload [field=]path` values. A bare path goes to the `file` field, which is what most upload
+/// routes (firmwares, documents) read; image routes read `image` (also `--image`).
+export function parseUploads(values = []) {
+  return values.map((value) => {
+    const match = /^([A-Za-z0-9_[\].-]+)=(.+)$/.exec(value)
+    return match ? {field: match[1], path: match[2]} : {field: 'file', path: value}
+  })
+}
+
+/// Sends the body as multipart form data when files are attached, with every body field as a form field
+/// (objects as JSON). Without files the body stays JSON.
+export async function maybeFormData(data, uploads = []) {
+  const files = typeof uploads === 'string' ? [{field: 'image', path: uploads}] : (uploads || [])
+  if (files.length === 0) return data
   const form = new FormData()
   for (const [key, value] of Object.entries(data || {})) {
+    if (value === undefined) continue
     form.append(key, typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value))
   }
-  const bytes = await readFile(imagePath)
-  form.append('image', new Blob([bytes]), path.basename(imagePath))
+  for (const file of files) {
+    const bytes = await readFile(file.path)
+    form.append(file.field, new Blob([bytes]), path.basename(file.path))
+  }
   return form
 }
 
@@ -152,7 +215,7 @@ export async function requestResource(client, resource, action, args, data) {
     get: 'get',
     delete: 'delete',
   }[action]
-  return client.request('organization', 'v1', method.toUpperCase(), pathValue, data)
+  return sendRequest(client, method.toUpperCase(), pathValue, data)
 }
 
 export async function requestResourceSchema(client, resource, action) {
@@ -187,7 +250,7 @@ export async function requestRaw(client, method, rawPath, data) {
 	if (method.toUpperCase() === 'OPTIONS') {
 		return requestWithoutBody(client, 'OPTIONS', cleanPath)
 	}
-	return client.request('organization', 'v1', method.toUpperCase(), cleanPath, data)
+	return sendRequest(client, method.toUpperCase(), cleanPath, data)
 }
 
 async function requestWithoutBody(client, method, pathValue) {
@@ -196,12 +259,12 @@ async function requestWithoutBody(client, method, pathValue) {
 		headers.Authorization = `Bearer ${client.token}`
 	}
 
-	const response = await fetch(`${client.buildApiRoot('organization')}/v1/${pathValue}`, {
+	const response = await withNetworkRetry(method, () => fetch(`${client.buildApiRoot('organization')}/v1/${pathValue}`, {
 		method,
 		headers,
 		body: null,
 		credentials: client.isBrowser ? 'include' : 'omit',
-	})
+	}), {onRetry: logRetry})
 
 	if (response.status === 204) return undefined
 
